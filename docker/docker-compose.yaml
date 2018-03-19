@@ -1,0 +1,54 @@
+version: '2'
+
+services:
+  fluentd:
+    build: ./fluentd
+    volumes:
+      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf
+      - ./fluentd/buffer:/home/fluent/buffer
+    environment:
+      FLUENTD_CONF: fluent.conf
+    ports:
+      - "9880:9880"
+    restart: unless-stopped
+    depends_on:
+      - elasticsearch
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    volumes:
+      - ./mongo:/data/db
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+    mem_limit: 4g
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.2
+    volumes:
+      - ./esdata:/usr/share/elasticsearch/data
+    expose:
+      - "9200"
+    restart: unless-stopped
+    environment:
+      - bootstrap.memory_lock=true
+      - http.max_content_length=1g
+      - thread_pool.index.queue_size=-1
+      - thread_pool.bulk.queue_size=-1
+      - "ES_JAVA_OPTS=-Xms4096m -Xmx4096m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 8g
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.2.2
+    ports:
+      - "5601:5601"
+    restart: unless-stopped
+    environment:
+      - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+    depends_on:
+      - elasticsearch
