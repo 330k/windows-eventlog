@@ -1,8 +1,24 @@
+<#PSScriptInfo
+.VERSION 1.0
+.AUTHOR 330k
+.COPYRIGHT 330k
+.TAGS EventLog
+.LICENSEURI https://github.com/330k/windows-eventlog/blob/master/LICENSE
+.PROJECTURI https://github.com/330k/windows-eventlog
+.ICONURI
+.EXTERNALMODULEDEPENDENCIES
+.REQUIREDSCRIPTS
+.EXTERNALSCRIPTDEPENDENCIES
+.RELEASENOTES
+#>
+<#
+.DESCRIPTION
+ Compress a file with gzip.
+#>
 ﻿Param(
     [String]$inFile = $(throw "Compress-Gzip: No filename specified"),
     [String]$outFile = $($inFile + ".gz"),
-    [switch]$delete,
-    [int]$bufsize = 1048576
+    [switch]$delete
 );
 
 Trap{
@@ -22,16 +38,7 @@ $output = New-Object System.IO.FileStream $outFile, ([IO.FileMode]::Create), ([I
 $gzipStream = New-Object System.IO.Compression.GzipStream $output, ([IO.Compression.CompressionMode]::Compress)
 
 try{
-    $buffer = New-Object byte[]($bufsize);
-
-    while($true){
-        $read = $input.Read($buffer, 0, $bufsize)
-        if ($read -le 0){
-            break;
-        }
-
-        $gzipStream.Write($buffer, 0, $read)
-    }
+    $gzipStream.CopyTo($output)
 }finally{
     $gzipStream.Close();
     $output.Close();

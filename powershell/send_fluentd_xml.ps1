@@ -1,6 +1,25 @@
+<#PSScriptInfo
+.VERSION 1.0
+.AUTHOR 330k
+.COPYRIGHT 330k
+.TAGS EventLog
+.LICENSEURI https://github.com/330k/windows-eventlog/blob/master/LICENSE
+.PROJECTURI https://github.com/330k/windows-eventlog
+.ICONURI
+.EXTERNALMODULEDEPENDENCIES
+.REQUIREDSCRIPTS
+.EXTERNALSCRIPTDEPENDENCIES "compress_gzip.ps1"
+.RELEASENOTES
+#>
+<#
+.DESCRIPTION
+ Send eventlog XML to fluentd.
+
+ $fluentd : Set the fluentd IP address and port
+#>
 ﻿Param(
     [string]$xmlFile = $(throw "Send-Eventlog: No filename specified"),
-    [string]$fluentd = "http://192.168.10.229:9880/windows.eventlog",
+    [string]$fluentd = "http://127.0.0.1:9880/windows.eventlog",
     [int]$bulkSize = 200,
     [bool]$compress = $true
 )

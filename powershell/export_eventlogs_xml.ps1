@@ -1,5 +1,28 @@
+<#PSScriptInfo
+.VERSION 1.0
+.AUTHOR 330k
+.COPYRIGHT 330k
+.TAGS EventLog
+.LICENSEURI https://github.com/330k/windows-eventlog/blob/master/LICENSE
+.PROJECTURI https://github.com/330k/windows-eventlog
+.ICONURI
+.EXTERNALMODULEDEPENDENCIES
+.REQUIREDSCRIPTS
+.EXTERNALSCRIPTDEPENDENCIES "send_fluentd_xml.ps1"
+.RELEASENOTES
+#>
+<#
+.DESCRIPTION
+ Export Windows Event Log with wevtutil.exe.
+ Output XML contains rendered information is Unicode encoded.
+
+ $hosts : Target Machines
+ $logNames : Target Log Names (Default: "Security", "Application", "System")
+ $datestart : Start date of event logs to retrieve
+ $dateend : End date of event logs to retrive
+#>
 ﻿Param (
-    $hosts = @("ICOAD1", "ICOAD2", "ICOFS", "ICOACSRV", "ICOGRN", "ICOSD", "ICOSKY"),
+    $hosts = @("SERVER1", "SERVER2", "SERVER3"),
     $logNames = @("Security", "Application", "System"),
     $dateStart = $null,
     $dateEnd = [System.DateTime]::UtcNow.AddMinutes(-5)
@@ -26,8 +49,8 @@ Out-File -InputObject (ConvertTo-Json $setting) -FilePath $settingfile -Force
 Write-Host "start: $dateStart"
 Write-Host "end:   $dateEnd"
 
-
-$dirbase = "\\172.16.20.126\e$\logs\"
+# Set the folder to save XML
+$dirbase = "D:\logs\"
 
 $dateStartutc = [System.TimeZoneInfo]::ConvertTimeToUtc($dateStart).ToString("yyyy-MM-ddTHH:mm:ssZ")
 $dateEndutc = [System.TimeZoneInfo]::ConvertTimeToUtc($dateEnd).ToString("yyyy-MM-ddTHH:mm:ssZ")
@@ -48,7 +71,8 @@ foreach($h in $hosts){
             if( Test-Path $xmlFile ){
             }else{
                 $xml = wevtutil.exe qe "$l" """/q:$query""" """/r:$h""" "/uni:true" "/f:RenderedXml"
-                $xml = $xml -replace " xmlns='.+?'", "" # 名前空間削除
+                # Delete Namespace in XML
+                $xml = $xml -replace " xmlns='.+?'", ""
                 Out-File -InputObject $xml -FilePath $xmlFile -Encoding utf8 -Force
             }
 

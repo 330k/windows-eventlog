@@ -1,3 +1,20 @@
+<#PSScriptInfo
+.VERSION 1.0
+.AUTHOR 330k
+.COPYRIGHT 330k
+.TAGS EventLog
+.LICENSEURI https://github.com/330k/windows-eventlog/blob/master/LICENSE
+.PROJECTURI https://github.com/330k/windows-eventlog
+.ICONURI
+.EXTERNALMODULEDEPENDENCIES
+.REQUIREDSCRIPTS
+.EXTERNALSCRIPTDEPENDENCIES
+.RELEASENOTES
+#>
+<#
+.DESCRIPTION
+ Decompress a file with gzip.
+#>
 ﻿Param(
     [String]$inFile = $(throw "Extract-Gzip: No filename specified"),
     [String]$outFile = $($inFile -ireplace ".gz$", ""),
@@ -27,6 +44,7 @@ try{
     $output.Close();
     $input.Close();
 }
+
 if ($delete){
     Remove-Item $inFile
 }
