@@ -38,7 +38,7 @@ $output = New-Object System.IO.FileStream $outFile, ([IO.FileMode]::Create), ([I
 $gzipStream = New-Object System.IO.Compression.GzipStream $output, ([IO.Compression.CompressionMode]::Compress)
 
 try{
-    $gzipStream.CopyTo($output)
+    $input.CopyTo($output)
 }finally{
     $gzipStream.Close();
     $output.Close();
